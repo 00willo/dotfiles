@@ -16,6 +16,7 @@ packages:
       - "ghq"
       - "glow"
       - "fastfetch"
+      - "gitleaks"
     casks:
       - "wezterm"
       - "font-jetbrains-mono-nerd-font"
