@@ -1,0 +1,5 @@
+["scripts/fzf-git.sh"]
+type = "file"
+url = "https://raw.githubusercontent.com/junegunn/fzf-git.sh/refs/heads/main/fzf-git.sh"
+refreshPeriod = "168h"
+executable = true

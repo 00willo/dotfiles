@@ -1,0 +1,25 @@
+packages:
+  #universal:
+  darwin:
+    taps:
+      - "cloudflare/cloudflare"
+    brews:
+      - "bat"
+      - "eza"
+      - "fzf"
+      - "fd"
+      - "neovim"
+      - "starship"
+      - "zsh-autosuggestions"
+      - "zsh-syntax-highlighting"
+      - "zoxide"
+      - "ghq"
+      - "glow"
+      - "fastfetch"
+    casks:
+      - "wezterm"
+      - "font-jetbrains-mono-nerd-font"
+      - "google-chrome"
+      - "granola"
+      - "bitwarden"
+      #- "visual-studio-code"

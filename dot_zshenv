@@ -1,0 +1,27 @@
+# XDG base directories
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+# Editors
+export EDITOR="nvim"
+export VISUAL="$EDITOR"
+
+# GPG
+export GPG_TTY=$(tty)
+
+# PATH
+typeset -U path PATH
+
+path=(
+    "$HOME/.local/bin"
+    "$HOME/bin"
+    "$HOME/scripts"
+    $path
+)
+
+# Homebrew
+[[ -r "$XDG_CONFIG_HOME/zsh/homebrew.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/homebrew.zsh"
+
+export PATH

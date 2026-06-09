@@ -1,0 +1,32 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env zsh
+
+set -euo pipefail
+
+profile_name="Clear Dark"
+profile_file="ClearDark_JetBrainsMono-Nerd-Font-SemiBold.terminal"
+profile_path="${HOME}/.local/share/terminal-profiles/${profile_file}"
+
+profile_exists() {
+  defaults read com.apple.Terminal "Window Settings" 2>/dev/null \
+    | grep -qE "^[[:space:]]+\"${profile_name}\"[[:space:]]*=[[:space:]]*\\{"
+}
+
+if [[ ! -f "$profile_path" ]]; then
+  echo "Terminal profile not found: $profile_path" >&2
+  exit 1
+fi
+
+if profile_exists; then
+  echo "macOS Terminal profile already exists: ${profile_name}"
+else
+  echo "Importing macOS Terminal profile: ${profile_path}"
+  open "$profile_path"
+  sleep 1
+fi
+
+defaults write com.apple.Terminal "Default Window Settings" -string "$profile_name"
+defaults write com.apple.Terminal "Startup Window Settings" -string "$profile_name"
+
+echo "Set macOS Terminal default profile: ${profile_name}"
+{{- end }}

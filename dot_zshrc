@@ -1,0 +1,26 @@
+# ~/.zshrc
+
+ZSH_CONFIG_DIR="$XDG_CONFIG_HOME/zsh"
+
+for config_file in \
+  options.zsh \
+  history.zsh \
+  completion.zsh \
+  prompt.zsh \
+  keybindings.zsh \
+  plugins.zsh \
+  fzf.zsh \
+  zoxide.zsh \
+  aliases.zsh \
+  python.zsh \
+  navigation.zsh \
+  work.zsh \
+  repos.zsh \
+  worktrees.zsh
+do
+  config_path="$ZSH_CONFIG_DIR/$config_file"
+
+  if [[ -r "$config_path" ]]; then
+    source "$config_path"
+  fi
+done
