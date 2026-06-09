@@ -1,0 +1,16 @@
+[user]
+    name = Graham Williamson
+    email = graham@williamsonsinc.id.au
+
+[github]
+    user = 00willo
+
+[ghq]
+    user = 00willo
+    root = ~/config
+    root = ~/projects
+    root = ~/lab
+    root = ~/ventures
+    root = ~/reference
+    root = ~/scratch/git
+    root = ~/work

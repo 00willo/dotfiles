@@ -115,7 +115,7 @@ _ghq_get_into_root() {
   fi
 
   mkdir -p "$root_path"
-  GHQ_ROOT="$root_path" ghq get "$@"
+  GHQ_ROOT="$root_path" ghq get -p "$@"
 }
 
 # Clone into config/bootstrap repos.
