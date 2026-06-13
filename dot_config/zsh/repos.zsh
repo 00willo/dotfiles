@@ -93,10 +93,39 @@ _repo_root() {
   esac
 }
 
+# Internal helper: show usage for ghq clone helpers.
+_repo_clone_usage() {
+  local root_path="$1"
+  local helper_name="${2:-gclone}"
+
+  cat <<EOF >&2
+Missing repo URL or GitHub shorthand.
+
+Usage:
+  $helper_name <repo>
+  $helper_name <owner/repo>
+  $helper_name <host/owner/repo>
+  $helper_name <git-url>
+
+Examples:
+  $helper_name dotfiles
+  $helper_name 00willo/dotfiles
+  $helper_name github.com/00willo/dotfiles
+  $helper_name git@github.com:00willo/dotfiles.git
+
+Notes:
+  - Single repo names use ghq.user as the default GitHub owner.
+  - Repositories are cloned via SSH using: ghq get -p
+  - This helper clones into: $root_path
+  - For more detail, run: repo-help
+EOF
+}
+
 # Internal helper: clone a repo into a specific root using ghq.
 _ghq_get_into_root() {
   local root_path="$1"
-  shift
+  local helper_name="${2:-gclone}"
+  shift 2
 
   if ! command -v ghq >/dev/null 2>&1; then
     echo "ghq is not installed or not in PATH." >&2
@@ -110,7 +139,7 @@ _ghq_get_into_root() {
   fi
 
   if [[ $# -eq 0 ]]; then
-    echo "Missing repo URL or GitHub shorthand." >&2
+    _repo_clone_usage "$root_path" "$helper_name"
     return 1
   fi
 
@@ -129,7 +158,7 @@ _ghq_get_into_root() {
 #   gconfig git@github.com:00willo/dotfiles.git
 #   gconfig git@github.com:<work-org>/dotfiles-work.git
 gconfig() {
-  _ghq_get_into_root "$REPO_CONFIG" "$@"
+  _ghq_get_into_root "$REPO_CONFIG" "gconfig" "$@"
 }
 
 # Short alias for config repos.
@@ -143,7 +172,7 @@ gcfg() {
 #   gprojects git@github.com:00willo/python-tools.git
 #   gproj git@github.com:some-org/project-you-contribute-to.git
 gprojects() {
-  _ghq_get_into_root "$REPO_PROJECTS" "$@"
+  _ghq_get_into_root "$REPO_PROJECTS" "gprojects" "$@"
 }
 
 # Short alias for personal projects.
@@ -157,7 +186,7 @@ gproj() {
 #   glab git@github.com:00willo/homelab.git
 #   glab git@github.com:00willo/detection-lab.git
 glab() {
-  _ghq_get_into_root "$REPO_LAB" "$@"
+  _ghq_get_into_root "$REPO_LAB" "glab" "$@"
 }
 
 # Clone into side-hustle/business/venture repos.
@@ -166,7 +195,7 @@ glab() {
 #   gventures git@github.com:00willo/credential-vault-prototype.git
 #   gven git@github.com:00willo/ai-agency-discovery.git
 gventures() {
-  _ghq_get_into_root "$REPO_VENTURES" "$@"
+  _ghq_get_into_root "$REPO_VENTURES" "gventures" "$@"
 }
 
 # Short alias for ventures.
@@ -181,7 +210,7 @@ gven() {
 # Example:
 #   gwork git@github.com:<work-org>/identity-automation.git
 gwork() {
-  _ghq_get_into_root "$REPO_WORK" "$@"
+  _ghq_get_into_root "$REPO_WORK" "gwork" "$@"
 }
 
 # Clone into reference/read-only repos.
@@ -192,7 +221,7 @@ gwork() {
 #   gref git@github.com:<work-org>/repo-you-mostly-read.git
 #   gref git@github.com:public-org/useful-reference-tool.git
 greference() {
-  _ghq_get_into_root "$REPO_REFERENCE" "$@"
+  _ghq_get_into_root "$REPO_REFERENCE" "greference" "$@"
 }
 
 # Short alias for reference repos.
@@ -211,7 +240,7 @@ gref() {
 # Example:
 #   gscratch git@github.com:LazyVim/starter.git
 gscratch() {
-  _ghq_get_into_root "$REPO_SCRATCH" "$@"
+  _ghq_get_into_root "$REPO_SCRATCH" "gscratch" "$@"
 }
 
 # Fuzzy-select a repo and cd into it.
