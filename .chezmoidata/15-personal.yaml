@@ -1,0 +1,13 @@
+packages:
+  #base_universal:
+  darwin:
+    personal_taps: []
+    personal_cli_brews: []
+    personal_casks:
+      - "bitwarden"
+      - "lm-studio"
+      - "granola"
+git:
+  email: graham@williamsonsinc.id.au
+github:
+  user: 00willo

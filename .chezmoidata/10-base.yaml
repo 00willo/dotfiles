@@ -1,0 +1,28 @@
+git:
+  name: Graham Williamson
+
+packages:
+  #base_universal:
+  darwin:
+    base_taps: []
+    base_cli_brews:
+      - "bat"
+      - "eza"
+      - "fastfetch"
+      - "fd"
+      - "fzf"
+      - "ghq"
+      - "git"
+      - "gitleaks"
+      - "glow"
+      - "neovim"
+      - "ripgrep"
+      - "starship"
+      - "zoxide"
+      - "zsh-autosuggestions"
+      - "zsh-syntax-highlighting"
+    base_casks:
+      - "font-jetbrains-mono-nerd-font"
+      - "google-chrome"
+      - "visual-studio-code"
+      - "wezterm"
