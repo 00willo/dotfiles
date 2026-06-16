@@ -14,6 +14,7 @@ for config_file in \
   zoxide.zsh \
   aliases.zsh \
   python.zsh \
+  lmstudio.zsh \
   navigation.zsh \
   work.zsh \
   repos.zsh \
