@@ -1,12 +1,12 @@
 [user]
-    name = Graham Williamson
-    email = graham@williamsonsinc.id.au
+    name = {{ .git.name }}
+    email = {{ .git.email }}
 
 [github]
-    user = 00willo
+    user = {{ .github.user }}
 
 [ghq]
-    user = 00willo
+    user = {{ .github.user }}
     root = ~/config
     root = ~/projects
     root = ~/lab
