@@ -2,30 +2,45 @@
 
 Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/).
 
-This repository contains my shell, terminal, prompt, package, and workflow configuration for quickly setting up a familiar development environment across machines.
+This repository contains shell, terminal, package, git, and workflow configuration for quickly creating a consistent development environment across personal and work machines.
+
+The configuration is designed around:
+
+* XDG-friendly paths
+* layered chezmoi data
+* profile-aware configuration (personal and work)
+* modular shell configuration
+* reproducible package installation
+* clean separation between personal and work environments
 
 ## What this repo manages
 
-* Zsh configuration split into small, focused files
-* XDG-aware shell startup files
-* Starship prompt configuration
-* WezTerm configuration
+* Modular Zsh configuration
+* XDG shell startup files
+* Starship prompt
+* WezTerm terminal
 * Homebrew package installation on macOS
-* Helper scripts for fuzzy file/repo workflows
-* Repository layout helpers using `ghq`
-* Git worktree helpers for parallel development and agent-assisted coding sessions
-* Basic bootstrap assets for Linux/Fedora-style setup experiments
+* Git identity and GitHub configuration
+* Repository layout helpers using ghq
+* Git worktree helpers
+* Machine bootstrap experiments
+* Profile-aware personal/work customisation
 
 ## Repository layout
 
 ```text
 .
 ├── .chezmoidata/
-│   └── packages.yaml
+│ ├── 00-profile.yaml
+│ ├── 10-base.yaml
+│ ├── 15-personal.yaml
+│ └── 90-work.yaml (optional)
 ├── .chezmoiexternal.toml
 ├── dot_bootstrap/
 │   └── setup.yaml
 ├── dot_config/
+│   ├── git/
+│   │   └── config.tmpl
 │   ├── starship.toml
 │   ├── wezterm/
 │   │   └── wezterm.lua
@@ -36,6 +51,7 @@ This repository contains my shell, terminal, prompt, package, and workflow confi
 │       ├── history.zsh
 │       ├── homebrew.zsh
 │       ├── keybindings.zsh
+│       ├── lmstudio.zsh
 │       ├── navigation.zsh
 │       ├── options.zsh
 │       ├── plugins.zsh
@@ -52,18 +68,96 @@ This repository contains my shell, terminal, prompt, package, and workflow confi
 └── run_onchange_*.tmpl
 ```
 
+## Configuration model
+
+Configuration is layered using chezmoi data files.
+
+Example:
+```text
+.chezmoidata/
+├── 00-profile.yaml
+├── 10-base.yaml
+├── 15-personal.yaml
+└── 90-work.yaml
+```
+
+## Profile selection
+
+Default:
+```yaml
+profile:
+  kind: personal
+```
+Work overrides:
+```yaml
+profile:
+  kind: work
+```
+Templates can use:
+
+```text
+{{ if eq .profile.kind "work" }}
+...
+{{ end }}
+```
+
+## Package management
+
+Packages are defined as structured data and rendered into Homebrew Bundle format.
+
+Example:
+
+```yaml
+packages:
+  darwin:
+    base_taps: []
+    base_cli_brews: []
+    base_casks: []
+```
+
+Profile-specific extensions:
+
+```yaml
+packages:
+  darwin:
+    personal_taps: []
+    personal_cli_brews: []
+    personal_casks: []
+```
+
+```yaml
+packages:
+  darwin:
+    work_taps: []
+    work_cli_brews: []
+    work_casks: []
+```
+
+Package installation is performed through:
+
+```text
+run_onchange_darwin-install-packages.sh.tmpl
+```
+
+Apply:
+
+```sh
+chezmoi apply
+```
+
 ## Shell structure
 
-The main `.zshrc` is intentionally small. It sources individual config files from:
+Shell config lives under:
 
 ```text
 ~/.config/zsh/
 ```
 
-The current load order is:
+Current load order:
 
 ```text
 options.zsh
+homebrew.zsh
 history.zsh
 completion.zsh
 prompt.zsh
@@ -77,9 +171,29 @@ navigation.zsh
 work.zsh
 repos.zsh
 worktrees.zsh
+lmstudio.zsh
 ```
 
-This keeps each concern isolated and makes it easier to update, test, and disable specific parts of the shell setup.
+## Git configuration
+
+Git identity and GitHub configuration are templated.
+
+Example data:
+
+```yaml
+git:
+  name: Graham Williamson
+  email: example@example.com
+
+github:
+  user: username
+```
+
+Rendered into Git’s XDG global config:
+
+```text
+~/.config/git/config
+```
 
 ## Key tools
 
@@ -100,11 +214,6 @@ This setup currently leans on:
 * `eza`
 * `fd`
 
-On macOS, Homebrew packages are defined in:
-
-```text
-.chezmoidata/packages.yaml
-```
 
 ## Install
 
