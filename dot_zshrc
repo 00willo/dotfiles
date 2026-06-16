@@ -4,6 +4,7 @@ ZSH_CONFIG_DIR="$XDG_CONFIG_HOME/zsh"
 
 for config_file in \
   options.zsh \
+  homebrew.zsh \
   history.zsh \
   completion.zsh \
   prompt.zsh \
