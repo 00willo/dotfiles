@@ -1,9 +1,26 @@
 {{ if eq .chezmoi.os "darwin" -}}
 #!/bin/bash
+set -euo pipefail
+
+{{ range (.packages.darwin.base_trusted_formulae | default list) -}}
+brew trust --formula {{ . | quote }}
+{{ end -}}
+
+{{ if eq .profile.kind "personal" -}}
+{{ range (.packages.darwin.personal_trusted_formulae | default list) -}}
+brew trust --formula {{ . | quote }}
+{{ end -}}
+{{ end -}}
+
+{{ if eq .profile.kind "work" -}}
+{{ range (.packages.darwin.work_trusted_formulae | default list) -}}
+brew trust --formula {{ . | quote }}
+{{ end -}}
+{{ end -}}
 
 brew bundle --file=/dev/stdin <<EOF
 {{ range (.packages.darwin.base_taps | default list) -}}
-tap {{ . | quote }}
+tap {{ .name | quote }}, {{ .url | quote }}
 {{ end -}}
 {{ range (.packages.darwin.base_cli_brews | default list) -}}
 brew {{ . | quote }}
@@ -14,7 +31,7 @@ cask {{ . | quote }}
 
 {{ if eq .profile.kind "personal" -}}
 {{ range (.packages.darwin.personal_taps | default list) -}}
-tap {{ . | quote }}
+tap {{ .name | quote }}, {{ .url | quote }}
 {{ end -}}
 {{ range (.packages.darwin.personal_cli_brews | default list) -}}
 brew {{ . | quote }}
@@ -26,7 +43,7 @@ cask {{ . | quote }}
 
 {{ if eq .profile.kind "work" -}}
 {{ range (.packages.darwin.work_taps | default list) -}}
-tap {{ . | quote }}
+tap {{ .name | quote }}, {{ .url | quote }}
 {{ end -}}
 {{ range (.packages.darwin.work_cli_brews | default list) -}}
 brew {{ . | quote }}

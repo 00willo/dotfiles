@@ -5,6 +5,7 @@ packages:
   #base_universal:
   darwin:
     base_taps: []
+    base_trusted_formulae: []
     base_cli_brews:
       - "bat"
       - "eza"

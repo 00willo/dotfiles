@@ -1,8 +1,13 @@
 packages:
   #base_universal:
   darwin:
-    personal_taps: []
-    personal_cli_brews: []
+    personal_taps:
+      - name: jundot/omlx
+        url: https://github.com/jundot/omlx
+    personal_trusted_formulae:
+      - jundot/omlx/omlx
+    personal_cli_brews:
+      - "omlx"
     personal_casks:
       - "bitwarden"
       - "lm-studio"

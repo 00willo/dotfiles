@@ -21,5 +21,3 @@ path=(
 
 # PATH
 typeset -U path PATH
-
-
