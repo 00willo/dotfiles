@@ -8,10 +8,12 @@ packages:
       - jundot/omlx/omlx
     personal_cli_brews:
       - "omlx"
+      - "opencode"
     personal_casks:
       - "bitwarden"
       - "lm-studio"
       - "granola"
+      - "tailscale-app"
 git:
   email: graham@williamsonsinc.id.au
 github:
