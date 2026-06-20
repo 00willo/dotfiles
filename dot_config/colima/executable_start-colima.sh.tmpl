@@ -1,0 +1,15 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v colima >/dev/null 2>&1; then
+  echo "colima not found"
+  exit 1
+fi
+
+if colima status >/dev/null 2>&1; then
+  exit 0
+fi
+
+exec colima start --disk 40
+{{ end -}}

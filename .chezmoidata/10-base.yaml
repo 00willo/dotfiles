@@ -8,6 +8,9 @@ packages:
     base_trusted_formulae: []
     base_cli_brews:
       - "bat"
+      - "colima"
+      - "docker"
+      - "docker-compose"
       - "eza"
       - "fastfetch"
       - "fd"

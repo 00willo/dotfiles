@@ -1,0 +1,30 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Bump this when changing the Colima LaunchAgent behaviour.
+# version: 2026-06-20-01
+
+label="io.colima.start"
+plist="${HOME}/Library/LaunchAgents/${label}.plist"
+domain="gui/$(id -u)"
+service="${domain}/${label}"
+
+if [[ ! -f "${plist}" ]]; then
+  echo "LaunchAgent plist not found: ${plist}"
+  exit 0
+fi
+
+if ! command -v colima >/dev/null 2>&1; then
+  echo "colima not installed yet, skipping LaunchAgent load"
+  exit 0
+fi
+
+launchctl bootout "${domain}" "${plist}" >/dev/null 2>&1 || true
+launchctl bootstrap "${domain}" "${plist}"
+launchctl enable "${service}"
+launchctl kickstart -k "${service}"
+
+echo "Loaded ${label}"
+{{ end -}}
+
