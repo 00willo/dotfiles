@@ -45,22 +45,6 @@ export REPO_SCRATCH="$HOME/scratch/git"
 # be templated or conditionally included later if needed.
 export REPO_WORK="$HOME/work"
 
-
-repo-help() {
-  local doc_path="$XDG_CONFIG_HOME/zsh/docs/repo-workflow.md"
-
-  if [[ ! -r "$doc_path" ]]; then
-    echo "Repo workflow doc not found: $doc_path" >&2
-    return 1
-  fi
-
-  if command -v glow >/dev/null 2>&1; then
-    glow "$doc_path"
-  else
-    ${PAGER:-less} "$doc_path"
-  fi
-}
-
 # Internal helper: resolve a friendly root name to a path.
 _repo_root() {
   case "$1" in
@@ -401,7 +385,7 @@ repo-help() {
 #   fi
 #
 #   root_path="$(_repo_root "$root_name")" || return
-#   _ghq_get_into_root "$root_path" "$repo_url"
+#   _ghq_get_into_root "$root_path" "gclone" "${@:2}"
 # }
 
 # Optional future helper:
