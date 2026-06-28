@@ -1,0 +1,9 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/zsh
+
+screenshot_dir="$HOME/Pictures/Screenshots"
+
+mkdir -p "$screenshot_dir"
+defaults write com.apple.screencapture location "$screenshot_dir"
+killall SystemUIServer
+{{ end -}}
