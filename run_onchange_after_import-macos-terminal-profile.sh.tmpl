@@ -1,4 +1,4 @@
-{{- if eq .chezmoi.os "darwin" -}}
+{{ if eq .chezmoi.os "darwin" -}}
 #!/usr/bin/env zsh
 
 set -euo pipefail
@@ -29,4 +29,4 @@ defaults write com.apple.Terminal "Default Window Settings" -string "$profile_na
 defaults write com.apple.Terminal "Startup Window Settings" -string "$profile_name"
 
 echo "Set macOS Terminal default profile: ${profile_name}"
-{{- end }}
+{{ end -}}
