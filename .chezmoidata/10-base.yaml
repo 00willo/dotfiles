@@ -29,5 +29,6 @@ packages:
     base_casks:
       - "font-jetbrains-mono-nerd-font"
       - "google-chrome"
+      - "obsidian"
       - "visual-studio-code"
       - "wezterm"
