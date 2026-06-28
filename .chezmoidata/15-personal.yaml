@@ -14,6 +14,9 @@ packages:
       - "lm-studio"
       - "granola"
       - "tailscale-app"
+      - "wispr-flow"
+      - "codexbar"
+      - "codex"
 git:
   email: graham@williamsonsinc.id.au
 github:
