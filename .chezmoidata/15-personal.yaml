@@ -17,6 +17,7 @@ packages:
       - "wispr-flow"
       - "codexbar"
       - "codex"
+      - "claude-code"
 git:
   email: graham@williamsonsinc.id.au
 github:
