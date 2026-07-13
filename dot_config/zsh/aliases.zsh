@@ -12,22 +12,22 @@ alias nlof="$HOME/scripts/fzf_listoldfiles.sh"
 alias nzo="$HOME/scripts/zoxide_openfiles_nvim.sh"
 
 # eza, better ls
-alias l='eza --icons'
-alias ls='eza --icons'
-alias ll='eza -lg --icons'
-alias la='eza -lag --icons'
+alias l='eza --icons=auto'
+alias ls='eza --icons=auto'
+alias ll='eza -lg --icons=auto'
+alias la='eza -lag --icons=auto'
 
 # eza tree views
-alias lt='eza -lTg --icons'
-alias lt1='eza -lTg --level=1 --icons'
-alias lt2='eza -lTg --level=2 --icons'
-alias lt3='eza -lTg --level=3 --icons'
+alias lt='eza -lTg --icons=auto'
+alias lt1='eza -lTg --level=1 --icons=auto'
+alias lt2='eza -lTg --level=2 --icons=auto'
+alias lt3='eza -lTg --level=3 --icons=auto'
 
 # eza tree views, including hidden files
-alias lta='eza -lTag --icons'
-alias lta1='eza -lTag --level=1 --icons'
-alias lta2='eza -lTag --level=2 --icons'
-alias lta3='eza -lTag --level=3 --icons'
+alias lta='eza -lTag --icons=auto'
+alias lta1='eza -lTag --level=1 --icons=auto'
+alias lta2='eza -lTag --level=2 --icons=auto'
+alias lta3='eza -lTag --level=3 --icons=auto'
 
 ## Make eza-backed aliases use eza completion.
 #if (( $+commands[eza] && $+functions[compdef] )); then
