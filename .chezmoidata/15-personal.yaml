@@ -11,14 +11,17 @@ packages:
       - "opencode"
     personal_casks:
       - "bitwarden"
+      - "claude"
       - "claude-code"
       - "codex"
       - "codexbar"
       - "lm-studio"
       - "granola"
       - "slack"
+      - "stats"
       - "tailscale-app"
       - "wispr-flow"
+      - "whatsapp"
 git:
   email: graham@williamsonsinc.id.au
 github:
