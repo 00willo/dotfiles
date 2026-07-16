@@ -8,6 +8,7 @@ packages:
     base_trusted_formulae: []
     base_cli_brews:
       - "bat"
+      - "chezmoi"
       - "colima"
       - "docker"
       - "docker-compose"
@@ -23,6 +24,7 @@ packages:
       - "neovim"
       - "ripgrep"
       - "starship"
+      - "uv"
       - "zoxide"
       - "zsh-autosuggestions"
       - "zsh-syntax-highlighting"
