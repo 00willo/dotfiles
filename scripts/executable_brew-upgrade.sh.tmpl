@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 {{ $remote := output "sh" "-c" (printf "git -C %s remote get-url origin 2>/dev/null || true" (.chezmoi.sourceDir | quote)) | trim -}}
