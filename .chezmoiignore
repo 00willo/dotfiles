@@ -2,5 +2,4 @@
 {{ if ne .chezmoi.os "darwin" }}
 .config/colima/
 Library/LaunchAgents/io.colima.start.plist
-run_onchange_darwin-load-colima-launchagent.sh
 {{ end }}

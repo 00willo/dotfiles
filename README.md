@@ -65,7 +65,8 @@ The configuration is designed around:
 ├── dot_zshenv
 ├── dot_zshrc
 ├── scripts/
-└── run_onchange_*.tmpl
+└── .chezmoiscripts/
+    └── run_onchange_*.tmpl
 ```
 
 ## Configuration model
@@ -136,7 +137,7 @@ packages:
 Package installation is performed through:
 
 ```text
-run_onchange_darwin-install-packages.sh.tmpl
+.chezmoiscripts/run_onchange_darwin-install-packages.sh.tmpl
 ```
 
 Apply:
