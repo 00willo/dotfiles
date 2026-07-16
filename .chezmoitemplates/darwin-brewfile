@@ -1,0 +1,33 @@
+{{ range (.packages.darwin.base_taps | default list) -}}
+tap {{ .name | quote }}, {{ .url | quote }}
+{{ end -}}
+{{ range (.packages.darwin.base_cli_brews | default list) -}}
+brew {{ . | quote }}
+{{ end -}}
+{{ range (.packages.darwin.base_casks | default list) -}}
+cask {{ . | quote }}
+{{ end -}}
+
+{{ if eq .profile.kind "personal" -}}
+{{ range (.packages.darwin.personal_taps | default list) -}}
+tap {{ .name | quote }}, {{ .url | quote }}
+{{ end -}}
+{{ range (.packages.darwin.personal_cli_brews | default list) -}}
+brew {{ . | quote }}
+{{ end -}}
+{{ range (.packages.darwin.personal_casks | default list) -}}
+cask {{ . | quote }}
+{{ end -}}
+{{ end -}}
+
+{{ if eq .profile.kind "work" -}}
+{{ range (.packages.darwin.work_taps | default list) -}}
+tap {{ .name | quote }}, {{ .url | quote }}
+{{ end -}}
+{{ range (.packages.darwin.work_cli_brews | default list) -}}
+brew {{ . | quote }}
+{{ end -}}
+{{ range (.packages.darwin.work_casks | default list) -}}
+cask {{ . | quote }}
+{{ end -}}
+{{ end -}}
