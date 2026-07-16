@@ -8,8 +8,8 @@ alias v='/opt/homebrew/bin/nvim'
 alias inv='nvim $(fzf -m --preview="bat --color=always {}")'
 
 # Custom scripts
-alias nlof="$HOME/scripts/fzf_listoldfiles.sh"
-alias nzo="$HOME/scripts/zoxide_openfiles_nvim.sh"
+alias nlof="fzf-list-old-files"
+alias nzo="zoxide-open-files-nvim"
 
 # eza, better ls
 alias l='eza --icons=auto'

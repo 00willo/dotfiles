@@ -18,7 +18,7 @@ brew trust --formula {{ . | quote }}
 {{ end -}}
 {{ end -}}
 
-# Install missing packages only. Upgrades are deliberate: run brew-upgrade.sh.
+# Install missing packages only. Upgrades are deliberate: run brew-upgrade.
 brew bundle install --no-upgrade --file=/dev/stdin <<EOF
 {{ template "darwin-brewfile" . -}}
 EOF

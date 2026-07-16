@@ -19,6 +19,6 @@ fi
 
 # FZF with Git by Junegunn:
 # Keymaps: https://github.com/junegunn/fzf-git.sh
-if [[ -r "$HOME/scripts/fzf-git.sh" ]]; then
-  source "$HOME/scripts/fzf-git.sh"
+if [[ -r "$HOME/.local/share/fzf-git/fzf-git.sh" ]]; then
+  source "$HOME/.local/share/fzf-git/fzf-git.sh"
 fi

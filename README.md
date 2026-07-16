@@ -61,10 +61,15 @@ The configuration is designed around:
 │       ├── work.zsh
 │       ├── worktrees.zsh
 │       └── zoxide.zsh
+├── dot_local/
+│   └── bin/
+│       ├── executable_brew-drift.tmpl
+│       ├── executable_brew-upgrade.tmpl
+│       ├── executable_fzf-list-old-files
+│       └── executable_zoxide-open-files-nvim
 ├── dot_zprofile
 ├── dot_zshenv
 ├── dot_zshrc
-├── scripts/
 └── .chezmoiscripts/
     └── run_onchange_*.tmpl
 ```
