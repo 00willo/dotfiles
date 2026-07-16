@@ -1,0 +1,8 @@
+# Local Claude Code settings
+.claude/
+
+# Local backups, never part of the managed state
+*.bak
+
+# macOS
+.DS_Store
