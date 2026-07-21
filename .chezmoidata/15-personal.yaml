@@ -15,6 +15,7 @@ packages:
       - "claude-code"
       - "codex"
       - "codexbar"
+      - "discord"
       - "lm-studio"
       - "granola"
       - "slack"
@@ -22,6 +23,7 @@ packages:
       - "tailscale-app"
       - "wispr-flow"
       - "whatsapp"
+      - "zoom"
 git:
   email: graham@williamsonsinc.id.au
 github:
