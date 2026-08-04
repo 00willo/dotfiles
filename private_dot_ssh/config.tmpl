@@ -1,0 +1,9 @@
+{{ if eq .chezmoi.os "darwin" -}}
+Include {{ .chezmoi.homeDir }}/.config/colima/ssh_config
+
+{{ end -}}
+Host *{{ if eq .chezmoi.os "darwin" }} !colima{{ end }}
+    AddKeysToAgent yes
+{{- if eq .chezmoi.os "darwin" }}
+    UseKeychain yes
+{{- end }}

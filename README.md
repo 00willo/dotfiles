@@ -394,6 +394,30 @@ Current external configuration:
 
 This allows selected third-party scripts to be refreshed without manually copying them into the repo.
 
+## SSH configuration
+
+`private_dot_ssh/config.tmpl` manages `~/.ssh/config`. On macOS it sets `AddKeysToAgent yes` and `UseKeychain yes` for all hosts except `colima`, so keys are added to `ssh-agent` automatically and their passphrases are stored in the macOS keychain. Both directives are macOS-only (`UseKeychain` isn't a recognised keyword on Linux), so the template omits them on other platforms.
+
+`UseKeychain` only covers keys ssh-agent already knows about. The first time you add a new key, load it into the agent and save its passphrase to the keychain with:
+
+```sh
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+```
+
+After that one-time step, macOS restarts (and new terminal sessions) will re-load the key and passphrase automatically via `UseKeychain`.
+
+On Linux there's no keychain integration, so just load the key into the agent for the session with the plain form:
+
+```sh
+ssh-add ~/.ssh/id_ed25519
+```
+
+To check which keys the agent currently has loaded (on either platform):
+
+```sh
+ssh-add -l
+```
+
 ## Security notes
 
 This repository is intended to be safe for public use, but dotfiles can accidentally collect sensitive data.
