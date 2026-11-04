@@ -35,3 +35,8 @@ packages:
       - "obsidian"
       - "visual-studio-code"
       - "wezterm"
+
+vscode:
+  base_extensions:
+    - ms-python.python
+#    - ms-python.vscode-pylance

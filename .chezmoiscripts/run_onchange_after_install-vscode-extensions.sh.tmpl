@@ -1,0 +1,8 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+{{ range .vscode.base_extensions -}}
+code --install-extension {{ . | quote }}
+{{ end -}}
+{{ end -}}
