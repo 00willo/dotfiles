@@ -16,6 +16,8 @@ alias l='eza --icons=auto'
 alias ls='eza --icons=auto'
 alias ll='eza -lg --icons=auto'
 alias la='eza -lag --icons=auto'
+alias ltr='eza -lag --icons=auto'
+alias lsltr='eza --long --sort=modified --reverse --icons=auto'
 
 # eza tree views
 alias lt='eza -lTg --icons=auto'
@@ -59,3 +61,6 @@ fi
 # Python
 alias py='python3'
 alias pip='python3 -m pip'
+
+# Tailscale
+alias tailscale='/Applications/Tailscale.app/Contents/MacOS/Tailscale'

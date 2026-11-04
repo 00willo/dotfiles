@@ -7,19 +7,25 @@ packages:
     personal_trusted_formulae:
       - jundot/omlx/omlx
     personal_cli_brews:
+      - "ansible"
       - "omlx"
       - "opencode"
     personal_casks:
+      - "anydesk"
       - "bitwarden"
+      # - "buzz"  # not the correct one, it's an audio app, not buzz.xyz
+      - "chatgpt"
       - "claude"
       - "claude-code"
       - "codex"
       - "codexbar"
       - "discord"
+      - "hermes-desktop"
       - "lm-studio"
       - "granola"
       - "slack"
       - "stats"
+      - "teamviewer"
       - "tailscale-app"
       - "wispr-flow"
       - "whatsapp"
