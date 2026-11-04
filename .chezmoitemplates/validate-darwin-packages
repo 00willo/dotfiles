@@ -1,0 +1,16 @@
+{{- if not (hasKey . "packages") -}}
+  {{- fail "Missing packages data; define packages.darwin with the required package lists." -}}
+{{- end -}}
+{{- if not (hasKey .packages "darwin") -}}
+  {{- fail "Missing packages.darwin; define the base and selected profile package lists." -}}
+{{- end -}}
+{{- $darwin := .packages.darwin -}}
+{{- $profile := .profile.kind -}}
+{{- range $prefix := list "base" $profile -}}
+  {{- range $suffix := list "taps" "trusted_formulae" "cli_brews" "casks" -}}
+    {{- $key := printf "%s_%s" $prefix $suffix -}}
+    {{- if not (hasKey $darwin $key) -}}
+      {{- fail (printf "Missing packages.darwin.%s; define it in the %s profile data (use [] if unused)." $key $prefix) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

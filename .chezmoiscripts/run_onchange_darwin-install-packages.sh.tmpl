@@ -1,4 +1,5 @@
 {{ if eq .chezmoi.os "darwin" -}}
+{{ template "validate-darwin-packages" . -}}
 #!/usr/bin/env bash
 set -euo pipefail
 

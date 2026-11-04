@@ -1,3 +1,4 @@
+{{ template "validate-darwin-packages" . -}}
 {{ range (.packages.darwin.base_taps | default list) -}}
 tap {{ .name | quote }}, {{ .url | quote }}
 {{ end -}}

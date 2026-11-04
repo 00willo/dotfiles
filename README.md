@@ -110,6 +110,10 @@ Templates can use:
 ## Package management
 
 Packages are defined as structured data and rendered into Homebrew Bundle format.
+The base lists are always used; the personal or work lists are added according
+to `profile.kind`. Define every list for the base and selected profile, using
+`[]` for an empty list. The templates access these keys even when a list has no
+entries, so omitting a key can cause template rendering to fail.
 
 Example:
 
@@ -117,6 +121,7 @@ Example:
 packages:
   darwin:
     base_taps: []
+    base_trusted_formulae: []
     base_cli_brews: []
     base_casks: []
 ```
@@ -127,6 +132,7 @@ Profile-specific extensions:
 packages:
   darwin:
     personal_taps: []
+    personal_trusted_formulae: []
     personal_cli_brews: []
     personal_casks: []
 ```
@@ -135,9 +141,31 @@ packages:
 packages:
   darwin:
     work_taps: []
+    work_trusted_formulae: []
     work_cli_brews: []
     work_casks: []
 ```
+
+The personal lists live in `15-personal.yaml`. A separate work repo can omit
+that file and provide the complete work lists in its own `90-work.yaml`.
+
+The Brewfile template, `.chezmoitemplates/darwin-brewfile`, uses the tap,
+CLI brew and cask lists to produce the package entries. Tap entries have a
+`name` and `url`; CLI brews are Homebrew formulae, while casks are apps.
+
+The `*_trusted_formulae` lists are used by the installation script, not the
+Brewfile template. They contain fully qualified names of individual formulae
+from third-party taps that Homebrew should trust before installation. This
+allows a specific formula to be loaded without trusting the entire tap. For
+example, the personal profile trusts `jundot/omlx/omlx` and separately lists
+`omlx` for installation.
+
+This repo's package configuration is designed to be secure by default. It relies
+on Homebrew's own trust and security processes for official formulae. For
+third-party taps, this repo's policy is to explicitly trust only the individual
+formulae needed, rather than the entire tap. Add each approved formula to the
+appropriate `*_trusted_formulae` list. See Homebrew's
+[tap trust documentation](https://docs.brew.sh/Tap-Trust) for how this works.
 
 Package installation is performed through:
 
