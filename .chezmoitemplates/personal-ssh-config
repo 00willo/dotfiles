@@ -1,0 +1,6 @@
+# Personal homelab hosts.
+# Identity configured for willo@hotshot.lan.cyberlan.xyz (M5 MacBook Pro).
+Host 192.168.5.161 192.168.5.162 192.168.5.163
+    User root
+    IdentityFile ~/.ssh/id_ed25519
+    ForwardAgent yes

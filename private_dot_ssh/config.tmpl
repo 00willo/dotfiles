@@ -2,10 +2,9 @@
 Include {{ .chezmoi.homeDir }}/.config/colima/ssh_config
 
 {{ end -}}
-Host 192.168.5.161 192.168.5.162 192.168.5.163
-    User root
-    IdentityFile ~/.ssh/id_ed25519
-    ForwardAgent yes
+{{ if eq .profile.kind "personal" -}}
+{{ template "personal-ssh-config" . }}
+{{ end -}}
 
 Host *{{ if eq .chezmoi.os "darwin" }} !colima{{ end }}
     AddKeysToAgent yes
