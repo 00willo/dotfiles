@@ -78,14 +78,9 @@ The configuration is designed around:
 
 Configuration is layered using chezmoi data files.
 
-Example:
-```text
-.chezmoidata/
-├── 00-profile.yaml
-├── 10-base.yaml
-├── 15-personal.yaml
-└── 90-work.yaml
-```
+The personal repo contains `00-profile.yaml`, `10-base.yaml` and
+`15-personal.yaml`. A separate work repo can replace `15-personal.yaml` with
+its own `90-work.yaml`.
 
 ## Profile selection
 
@@ -94,7 +89,7 @@ Default:
 profile:
   kind: personal
 ```
-Work overrides:
+A work repo selects the work profile in its own `90-work.yaml`:
 ```yaml
 profile:
   kind: work
@@ -109,73 +104,116 @@ Templates can use:
 
 ## Package management
 
-Packages are defined as structured data and rendered into Homebrew Bundle format.
-The base lists are always used; the personal or work lists are added according
-to `profile.kind`. Define every list for the base and selected profile, using
-`[]` for an empty list. The templates access these keys even when a list has no
-entries, so omitting a key can cause template rendering to fail.
+The repo defines package groups in `.chezmoidata/`; each machine selects optional
+capabilities in the `[data.capabilities]` section of its local chezmoi config.
+Missing capabilities are off. The base selects Git and the Darwin bootstrap
+includes chezmoi. Profile-specific packages are kept separately: this repo's
+`15-personal.yaml` contains personal additions; a work repo supplies its own.
 
-Example:
+The current groups are `interactive_cli`, `zsh_extras`, `personal_shell`,
+`development`, `python_development`, `go_development`, `rust_development`,
+`containers`, `infrastructure_management`, `workstation_apps`, `ai_assistants`
+and `local_ai`. Go and Rust currently have no packages. Group definitions live
+in the numbered data files and the selected groups are combined and deduplicated
+in `.chezmoitemplates/darwin-brewfile`.
 
-```yaml
-packages:
-  darwin:
-    base_taps: []
-    base_trusted_formulae: []
-    base_cli_brews: []
-    base_casks: []
-```
+`machine.role` describes a workstation or server. `machine.gui` records GUI
+availability. `workstation_apps` requires a GUI; `local_ai` can be selected on
+a headless Mac to install OMLX without the LM Studio GUI. Colima autostart and
+setting the macOS Terminal default profile have separate local settings.
+Turning a capability off stops requesting its packages; it does not uninstall
+them or stop a service already running.
 
-Profile-specific extensions:
+`packages.universal.base_cli` holds base names shared across supported systems.
+Darwin package definitions are implemented now; Fedora, AlmaLinux, Debian and
+Ubuntu are placeholders. Linux package installation is not implemented, so the
+Fedora example records intent but does not install its selected packages.
 
-```yaml
-packages:
-  darwin:
-    personal_taps: []
-    personal_trusted_formulae: []
-    personal_cli_brews: []
-    personal_casks: []
-```
+When implementing Linux package provisioning, handle repository prerequisites
+before resolving and installing the selected packages. For example, some
+AlmaLinux packages may require EPEL to be enabled first. Determine whether an
+enabled capability needs a repository, account for distribution and version
+differences, and respect work-machine repository policies rather than enabling
+EPEL unconditionally. Keep chezmoi itself as a bootstrap prerequisite; decide
+its package-manager treatment separately to avoid installing a second copy.
 
-```yaml
-packages:
-  darwin:
-    work_taps: []
-    work_trusted_formulae: []
-    work_cli_brews: []
-    work_casks: []
-```
-
-The personal lists live in `15-personal.yaml`. A separate work repo can omit
-that file and provide the complete work lists in its own `90-work.yaml`.
-
-The Brewfile template, `.chezmoitemplates/darwin-brewfile`, uses the tap,
-CLI brew and cask lists to produce the package entries. Tap entries have a
-`name` and `url`; CLI brews are Homebrew formulae, while casks are apps.
-
-The `*_trusted_formulae` lists are used by the installation script, not the
-Brewfile template. They contain fully qualified names of individual formulae
-from third-party taps that Homebrew should trust before installation. This
-allows a specific formula to be loaded without trusting the entire tap. For
-example, the personal profile trusts `jundot/omlx/omlx` and separately lists
-`omlx` for installation.
+### Third-party Homebrew trust
 
 This repo's package configuration is designed to be secure by default. It relies
-on Homebrew's own trust and security processes for official formulae. For
-third-party taps, this repo's policy is to explicitly trust only the individual
-formulae needed, rather than the entire tap. Add each approved formula to the
-appropriate `*_trusted_formulae` list. See Homebrew's
-[tap trust documentation](https://docs.brew.sh/Tap-Trust) for how this works.
+on Homebrew's trust and security processes for official formulae. For third-party
+taps, the default policy is to explicitly trust only the individual formulae
+needed. For example, this is how `15-personal.yaml` declares the OMLX tap,
+trusts its formula and selects it for installation:
 
-Package installation is performed through:
-
-```text
-.chezmoiscripts/run_onchange_darwin-install-packages.sh.tmpl
+```yaml
+profile_packages:
+  personal:
+    local_ai:
+      darwin:
+        taps:
+          - name: jundot/omlx
+            url: https://github.com/jundot/omlx
+        trusted_formulae:
+          - jundot/omlx/omlx
+        cli:
+          - omlx
 ```
 
-Apply:
+`trusted_formulae` grants trust; the separate `cli` entry selects the package
+for installation. Each trusted formula must be fully qualified as
+`user/tap/formula`, and its tap must also be declared in an enabled group.
+The generated Brewfile gives Homebrew Bundle formula-specific trust; it does
+not trust the entire tap.
+
+When there is a deliberate reason to trust **all current and future items** in a
+tap, set `trusted: true` on that tap entry instead. For example:
+
+```yaml
+profile_packages:
+  personal:
+    development:
+      darwin:
+        taps:
+          - name: example/tools
+            url: https://example.org/tools.git
+            trusted: true  # Explicitly trusts the entire tap.
+        cli:
+          - example-tool
+```
+
+These examples apply when their respective capability is enabled. Omitting
+`trusted` does not trust the entire tap. See Homebrew's
+[tap trust documentation](https://docs.brew.sh/Tap-Trust).
+
+### Machine selections and preflight
+
+Tracked starting profiles live in `examples/machines/`. Copy or merge their
+`[data.*]` sections into the machine's local chezmoi config, typically
+`~/.config/chezmoi/chezmoi.toml`, then edit them to suit the machine. The local
+config also holds other chezmoi settings; do not overwrite an existing file.
+
+Run `chezmoi-preflight` after applying the dotfiles, or before the first apply
+from the source directory with:
 
 ```sh
+ruby "$(chezmoi source-path)/dot_local/bin/executable_chezmoi-preflight"
+```
+
+The helper requires Ruby. It shows enabled and disabled choices, reports missing
+capabilities as off, and prints suggested `false` entries for review. Unknown
+capabilities, invalid selections and duplicate package definitions are errors.
+The duplicate-definition check inspects root `.chezmoidata` YAML files; it
+reports other data formats as unsupported rather than silently skipping them.
+A package selected by multiple groups is deduplicated during Brewfile rendering.
+
+The extension installer runs after each apply on a GUI-enabled Mac with Python
+development selected. It looks for the VS Code CLI and retries on a later apply
+if the editor is unavailable. It only installs extensions not already listed.
+
+Review and apply:
+
+```sh
+chezmoi diff
 chezmoi apply
 ```
 
@@ -201,11 +239,11 @@ fzf.zsh
 zoxide.zsh
 aliases.zsh
 python.zsh
+lmstudio.zsh
 navigation.zsh
 work.zsh
 repos.zsh
 worktrees.zsh
-lmstudio.zsh
 ```
 
 ## Git configuration
@@ -253,34 +291,78 @@ This setup currently leans on:
 
 ### First-time setup
 
-Install chezmoi:
+Download the macOS/Linux installer, then choose a starting configuration:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/00willo/dotfiles/main/install.sh -o /tmp/dotfiles-install.sh
+bash /tmp/dotfiles-install.sh --example personal-macbook
+```
+
+The raw URL becomes available after `install.sh` is committed and pushed. The
+example mode initialises the personal repository but waits for your review before
+applying. Running `bash /tmp/dotfiles-install.sh` without an example instead
+initialises and applies immediately; without local selections, optional groups
+are off and macOS receives only the base packages.
+
+This creates a local config only if one does not already exist, then stops for
+you to review it before `chezmoi diff` and `chezmoi apply`. Use
+`personal-fedora-workstation` for the Fedora example. If a config already exists,
+merge the relevant example sections into it manually. No existing config is
+overwritten.
+
+You can also download the file in a browser, copy it via removable storage, or
+host the same file at an internal URL. Run any copy with `bash install.sh`.
+It still needs access to the repository and upstream package/binary downloads.
+To install a separate work repo, point the installer at that repo using your
+normal Git credentials (the installer does not provision SSH keys):
+
+```sh
+DOTFILES_REPO=https://git.example.internal/you/dotfiles.git bash install.sh
+```
+
+The chosen repository supplies the profile. This personal repo selects `personal`;
+a work repo can select `work` in its `90-work.yaml`. The installer does not
+create or change profile data. When chezmoi is already initialised, it uses the
+existing source directory; do not rely on `DOTFILES_REPO` to switch an existing
+checkout to a different repository.
+
+On macOS, the installer checks Xcode Command Line Tools, installs Homebrew if
+missing, and installs chezmoi. If the tools are missing, finish Apple's installer
+and rerun the command. Homebrew may ask for your administrator password.
+
+On Linux, install `curl` and `git` with your distribution's package manager first.
+The installer installs chezmoi into `~/.local/bin` using its
+[official installer](https://www.chezmoi.io/install/), then applies the dotfiles.
+Linux package provisioning is not implemented yet: the Fedora Ansible playbook is
+an inactive experiment. Install Zsh and the tools you need separately; this script
+does not change your login shell. VS Code extension installation currently runs
+only on macOS.
+
+### Future work repo
+
+The intended work repo will start as a fresh snapshot of reviewed shared files,
+not a clone of this repo's Git history. A temporary clone can supply the files;
+the work repo would use its own `90-work.yaml` and empty work package choices.
+The file boundary, bootstrap script and traceable patch-update workflow are still
+to be designed. In the meantime, do not use this personal repo as a work profile.
+
+### Installer verification to do
+
+First-run and rerun testing in isolated environments is still to do. Linux can
+be exercised in a container; macOS needs a macOS runner or machine. Include a
+work-style fixture without personal data, and check missing prerequisites and
+existing chezmoi source directories. Avoid installing the full personal package
+set in automated checks unless that is specifically intended.
+
+### Manual setup
+
+With Homebrew and Git access already configured:
 
 ```sh
 brew install chezmoi
-```
-
-Initialise from GitHub:
-
-```sh
-chezmoi init git@github.com:00willo/dotfiles.git
-```
-
-Review the changes before applying:
-
-```sh
+chezmoi init https://github.com/00willo/dotfiles.git
 chezmoi diff
-```
-
-Apply the configuration:
-
-```sh
 chezmoi apply
-```
-
-Or do it in one command:
-
-```sh
-chezmoi init --apply git@github.com:00willo/dotfiles.git
 ```
 
 ## Day-to-day usage
@@ -424,7 +506,7 @@ This allows selected third-party scripts to be refreshed without manually copyin
 
 ## SSH configuration
 
-`private_dot_ssh/config.tmpl` manages `~/.ssh/config`. On macOS it sets `AddKeysToAgent yes` and `UseKeychain yes` for all hosts except `colima`, so keys are added to `ssh-agent` automatically and their passphrases are stored in the macOS keychain. Both directives are macOS-only (`UseKeychain` isn't a recognised keyword on Linux), so the template omits them on other platforms.
+`private_dot_ssh/config.tmpl` manages `~/.ssh/config`. On macOS it sets `AddKeysToAgent yes` and `UseKeychain yes` for all hosts except `colima`, so keys are added to `ssh-agent` automatically and their passphrases can be stored in the macOS keychain. On Linux it sets `AddKeysToAgent yes` for all hosts and omits the macOS-specific `UseKeychain` directive.
 
 `UseKeychain` only covers keys ssh-agent already knows about. The first time you add a new key, load it into the agent and save its passphrase to the keychain with:
 
