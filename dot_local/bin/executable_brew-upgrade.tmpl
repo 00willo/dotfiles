@@ -27,7 +27,7 @@ EOF
 
 if [[ "${1:-}" == "--dry-run" ]]; then
     # Strip tap prefixes so "jundot/omlx/omlx" matches brew's reported "omlx".
-    grep -oE '^(brew|cask) "[^"]+"' "$tmp/Brewfile" |
+    { grep -oE '^(brew|cask) "[^"]+"' "$tmp/Brewfile" || true; } |
         sed 's/^[a-z]* "//;s/"//;s|.*/||' | sort -u >"$tmp/declared"
 
     brew outdated --formula --quiet | sed 's|.*/||' | sort -u >"$tmp/outdated"

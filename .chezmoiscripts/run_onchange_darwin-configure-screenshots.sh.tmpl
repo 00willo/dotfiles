@@ -1,4 +1,4 @@
-{{ if eq .chezmoi.os "darwin" -}}
+{{ if and (eq .chezmoi.os "darwin") .machine.gui (get .capabilities "workstation_apps") -}}
 #!/usr/bin/env zsh
 
 screenshot_dir="$HOME/Pictures/Screenshots"

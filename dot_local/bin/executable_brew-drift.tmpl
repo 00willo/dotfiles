@@ -25,8 +25,8 @@ cat >"$tmp/Brewfile" <<EOF
 EOF
 
 # Strip any tap prefix so "jundot/omlx/omlx" matches brew's reported "omlx".
-grep -oE '^brew "[^"]+"' "$tmp/Brewfile" | sed 's/brew "//;s/"//;s|.*/||' | sort -u >"$tmp/declared_brews"
-grep -oE '^cask "[^"]+"' "$tmp/Brewfile" | sed 's/cask "//;s/"//' | sort -u >"$tmp/declared_casks"
+{ grep -oE '^brew "[^"]+"' "$tmp/Brewfile" || true; } | sed 's/brew "//;s/"//;s|.*/||' | sort -u >"$tmp/declared_brews"
+{ grep -oE '^cask "[^"]+"' "$tmp/Brewfile" || true; } | sed 's/cask "//;s/"//' | sort -u >"$tmp/declared_casks"
 
 brew list --installed-on-request | sed 's|.*/||' | sort -u >"$tmp/explicit_brews"
 brew list --cask | sort -u >"$tmp/installed_casks"

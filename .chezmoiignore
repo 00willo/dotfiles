@@ -1,4 +1,8 @@
+{{ template "validate-darwin-packages" . -}}
 README.md
+install.sh
+examples/
+tests/
 
 # Local backups kept in the source dir for reference; never deploy them.
 *.bak
@@ -8,7 +12,9 @@ README.md
 # so editing dot_bootstrap/setup.yaml cannot trigger an ansible run.
 bootstrap.sh
 
-{{ if ne .chezmoi.os "darwin" }}
+{{ if or (ne .chezmoi.os "darwin") (not (get .capabilities "containers")) }}
 .config/colima/
+{{ end }}
+{{ if or (ne .chezmoi.os "darwin") (not (get .capabilities "containers")) (not .services.colima.autostart) }}
 Library/LaunchAgents/io.colima.start.plist
 {{ end }}

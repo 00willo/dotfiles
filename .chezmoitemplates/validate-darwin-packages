@@ -1,16 +1,30 @@
-{{- if not (hasKey . "packages") -}}
-  {{- fail "Missing packages data; define packages.darwin with the required package lists." -}}
-{{- end -}}
-{{- if not (hasKey .packages "darwin") -}}
-  {{- fail "Missing packages.darwin; define the base and selected profile package lists." -}}
-{{- end -}}
-{{- $darwin := .packages.darwin -}}
-{{- $profile := .profile.kind -}}
-{{- range $prefix := list "base" $profile -}}
-  {{- range $suffix := list "taps" "trusted_formulae" "cli_brews" "casks" -}}
-    {{- $key := printf "%s_%s" $prefix $suffix -}}
-    {{- if not (hasKey $darwin $key) -}}
-      {{- fail (printf "Missing packages.darwin.%s; define it in the %s profile data (use [] if unused)." $key $prefix) -}}
-    {{- end -}}
+{{- $caps := .capabilities -}}
+{{- range $name, $enabled := $caps -}}
+  {{- if not (hasKey $.package_groups $name) -}}
+    {{- fail (printf "Unknown capability %q; check the spelling in your local chezmoi config." $name) -}}
   {{- end -}}
+  {{- if ne (kindOf $enabled) "bool" -}}
+    {{- fail (printf "Capability %q must be true or false." $name) -}}
+  {{- end -}}
+{{- end -}}
+{{- if not (has .machine.role (list "unspecified" "workstation" "server")) -}}
+  {{- fail "machine.role must be workstation or server (or unspecified until configured)." -}}
+{{- end -}}
+{{- if ne (kindOf .machine.gui) "bool" -}}
+  {{- fail "machine.gui must be true or false." -}}
+{{- end -}}
+{{- if ne (kindOf .services.colima.autostart) "bool" -}}
+  {{- fail "services.colima.autostart must be true or false." -}}
+{{- end -}}
+{{- if ne (kindOf .terminal.macos_terminal.set_default_profile) "bool" -}}
+  {{- fail "terminal.macos_terminal.set_default_profile must be true or false." -}}
+{{- end -}}
+{{- if and (get $caps "workstation_apps") (not .machine.gui) -}}
+  {{- fail "workstation_apps requires machine.gui = true; disable the capability or enable the GUI." -}}
+{{- end -}}
+{{- if and .services.colima.autostart (not (get $caps "containers")) -}}
+  {{- fail "Colima autostart requires the containers capability." -}}
+{{- end -}}
+{{- if and .terminal.macos_terminal.set_default_profile (not .machine.gui) -}}
+  {{- fail "The macOS Terminal default profile requires machine.gui = true." -}}
 {{- end -}}

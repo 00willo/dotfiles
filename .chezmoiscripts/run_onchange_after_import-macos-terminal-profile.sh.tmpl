@@ -1,4 +1,4 @@
-{{ if eq .chezmoi.os "darwin" -}}
+{{ if and (eq .chezmoi.os "darwin") .machine.gui .terminal.macos_terminal.set_default_profile -}}
 #!/usr/bin/env zsh
 
 set -euo pipefail

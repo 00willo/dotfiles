@@ -3,24 +3,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-{{ range (.packages.darwin.base_trusted_formulae | default list) -}}
-brew trust --formula {{ . | quote }}
-{{ end -}}
-
-{{ if eq .profile.kind "personal" -}}
-{{ range (.packages.darwin.personal_trusted_formulae | default list) -}}
-brew trust --formula {{ . | quote }}
-{{ end -}}
-{{ end -}}
-
-{{ if eq .profile.kind "work" -}}
-{{ range (.packages.darwin.work_trusted_formulae | default list) -}}
-brew trust --formula {{ . | quote }}
-{{ end -}}
-{{ end -}}
-
 # Install missing packages only. Upgrades are deliberate: run brew-upgrade.
-brew bundle install --no-upgrade --file=/dev/stdin <<EOF
-{{ template "darwin-brewfile" . -}}
-EOF
+brew bundle install --no-upgrade --file=/dev/stdin <<'EOF_BREWFILE'
+{{ template "darwin-brewfile" . }}
+EOF_BREWFILE
 {{ end -}}

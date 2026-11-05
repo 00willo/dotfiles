@@ -1,34 +1,69 @@
-{{ template "validate-darwin-packages" . -}}
-{{ range (.packages.darwin.base_taps | default list) -}}
-tap {{ .name | quote }}, {{ .url | quote }}
-{{ end -}}
-{{ range (.packages.darwin.base_cli_brews | default list) -}}
-brew {{ . | quote }}
-{{ end -}}
-{{ range (.packages.darwin.base_casks | default list) -}}
-cask {{ . | quote }}
-{{ end -}}
-
-{{ if eq .profile.kind "personal" -}}
-{{ range (.packages.darwin.personal_taps | default list) -}}
-tap {{ .name | quote }}, {{ .url | quote }}
-{{ end -}}
-{{ range (.packages.darwin.personal_cli_brews | default list) -}}
-brew {{ . | quote }}
-{{ end -}}
-{{ range (.packages.darwin.personal_casks | default list) -}}
-cask {{ . | quote }}
-{{ end -}}
-{{ end -}}
-
-{{ if eq .profile.kind "work" -}}
-{{ range (.packages.darwin.work_taps | default list) -}}
-tap {{ .name | quote }}, {{ .url | quote }}
-{{ end -}}
-{{ range (.packages.darwin.work_cli_brews | default list) -}}
-brew {{ . | quote }}
-{{ end -}}
-{{ range (.packages.darwin.work_casks | default list) -}}
-cask {{ . | quote }}
-{{ end -}}
-{{ end -}}
+{{- template "validate-darwin-packages" . -}}
+{{- $taps := dict -}}
+{{- $trustedFormulae := dict -}}
+{{- $brews := dict -}}
+{{- $casks := dict -}}
+{{- range .packages.universal.base_cli -}}
+  {{- $_ := set $brews . true -}}
+{{- end -}}
+{{- range .packages.darwin.base_cli -}}
+  {{- $_ := set $brews . true -}}
+{{- end -}}
+{{- $profile := get .profile_packages .profile.kind | default dict -}}
+{{- range $name, $group := .package_groups -}}
+  {{- if get $.capabilities $name -}}
+    {{- $profileGroup := get $profile $name | default dict -}}
+    {{- range $source := list $group $profileGroup -}}
+      {{- $universal := get $source "universal" | default dict -}}
+      {{- range (get $universal "cli" | default list) -}}
+        {{- $_ := set $brews . true -}}
+      {{- end -}}
+      {{- $darwin := get $source "darwin" | default dict -}}
+      {{- range (get $darwin "taps" | default list) -}}
+        {{- if and (hasKey . "trusted") (ne (kindOf .trusted) "bool") -}}
+          {{- fail (printf "Tap %s: trusted must be true or false." .name) -}}
+        {{- end -}}
+        {{- $tap := dict "url" .url "trusted" (get . "trusted" | default false) -}}
+        {{- if and (hasKey $taps .name) (not (deepEqual (get $taps .name) $tap)) -}}
+          {{- fail (printf "Conflicting URL or trust settings for tap %s." .name) -}}
+        {{- end -}}
+        {{- $_ := set $taps .name $tap -}}
+      {{- end -}}
+      {{- range (get $darwin "trusted_formulae" | default list) -}}
+        {{- $parts := splitList "/" . -}}
+        {{- if or (ne (len $parts) 3) (has "" $parts) -}}
+          {{- fail (printf "Trusted formula %q must be fully qualified as user/tap/formula." .) -}}
+        {{- end -}}
+        {{- $tapName := printf "%s/%s" (index $parts 0) (index $parts 1) -}}
+        {{- $formulae := get $trustedFormulae $tapName | default dict -}}
+        {{- $_ := set $formulae (index $parts 2) true -}}
+        {{- $_ := set $trustedFormulae $tapName $formulae -}}
+      {{- end -}}
+      {{- range (get $darwin "cli" | default list) -}}
+        {{- $_ := set $brews . true -}}
+      {{- end -}}
+      {{- range (get $darwin "casks" | default list) -}}
+        {{- $_ := set $casks . true -}}
+      {{- end -}}
+      {{- if $.machine.gui -}}
+        {{- range (get $darwin "gui_casks" | default list) -}}
+          {{- $_ := set $casks . true -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- range $name, $_ := $trustedFormulae -}}
+  {{- if not (hasKey $taps $name) -}}
+    {{- fail (printf "Trusted formulae for tap %q require that tap to be declared in an enabled package group." $name) -}}
+  {{- end -}}
+{{- end -}}
+{{- range $name, $tap := $taps }}
+tap {{ $name | quote }}, {{ $tap.url | quote }}{{ if $tap.trusted }}, trusted: true{{ else if hasKey $trustedFormulae $name }}, trusted: { formulae: {{ keys (get $trustedFormulae $name) | sortAlpha | toJson }} }{{ end }}
+{{- end -}}
+{{- range $name, $_ := $brews }}
+brew {{ $name | quote }}
+{{- end -}}
+{{- range $name, $_ := $casks }}
+cask {{ $name | quote }}
+{{- end }}

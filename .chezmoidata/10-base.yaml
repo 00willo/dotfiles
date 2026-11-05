@@ -1,42 +1,36 @@
 git:
   name: Graham Williamson
 
+machine:
+  role: unspecified
+  gui: false
+
+capabilities: {}
+profile_packages: {}
+services:
+  colima:
+    autostart: false
+terminal:
+  macos_terminal:
+    set_default_profile: false
+
 packages:
-  #base_universal:
+  universal:
+    base_cli:
+      - git
   darwin:
-    base_taps: []
-    base_trusted_formulae: []
-    base_cli_brews:
-      - "bat"
-      - "chezmoi"
-      - "colima"
-      - "docker"
-      - "docker-compose"
-      - "eza"
-      - "fastfetch"
-      - "fd"
-      - "fzf"
-      - "gh"
-      - "ghq"
-      - "git"
-      - "gitleaks"
-      - "glow"
-      - "lazygit"
-      - "neovim"
-      - "ripgrep"
-      - "starship"
-      - "uv"
-      - "zoxide"
-      - "zsh-autosuggestions"
-      - "zsh-syntax-highlighting"
-    base_casks:
-      - "font-jetbrains-mono-nerd-font"
-      - "google-chrome"
-      - "obsidian"
-      - "visual-studio-code"
-      - "wezterm"
+    base_cli:
+      - chezmoi
+  # Linux package installers and mappings are intentionally not implemented yet.
+  fedora:
+    cli: []
+  almalinux:
+    cli: []
+  debian:
+    cli: []
+  ubuntu:
+    cli: []
 
 vscode:
-  base_extensions:
+  python_extensions:
     - ms-python.python
-#    - ms-python.vscode-pylance

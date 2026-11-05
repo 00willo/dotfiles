@@ -1,0 +1,10 @@
+package_groups:
+  interactive_cli:
+    darwin:
+      cli: [bat, eza, fd, fzf, neovim, ripgrep, zoxide]
+  zsh_extras:
+    darwin:
+      cli: [zsh-autosuggestions, zsh-syntax-highlighting]
+  personal_shell:
+    darwin:
+      cli: [starship, fastfetch]

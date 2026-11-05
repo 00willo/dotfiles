@@ -1,0 +1,106 @@
+#!/usr/bin/env ruby
+# Inspect the effective machine selection and source definitions without applying.
+require 'json'
+require 'open3'
+require 'yaml'
+
+def chezmoi(*args)
+  out, err, status = Open3.capture3('chezmoi', *args)
+  abort("chezmoi #{args.first} failed: #{err.strip}") unless status.success?
+  out
+end
+
+if ARGV.length == 2 && ARGV[0] == '--example'
+  name = ARGV[1]
+  abort('Example name must contain only letters, numbers and hyphens.') unless name.match?(/\A[a-z0-9-]+\z/)
+  path = File.join(chezmoi('source-path').strip, 'examples', 'machines', "#{name}.toml")
+  abort("Example not found: #{name}") unless File.file?(path)
+  print File.read(path)
+  exit 0
+end
+abort('Usage: chezmoi-preflight [--example personal-macbook|personal-fedora-workstation]') unless ARGV.empty?
+
+source = chezmoi('source-path').strip
+errors = []
+seen_groups = {}
+seen_lists = {}
+walk = lambda do |node, path, file|
+  case node
+  when Hash
+    node.each { |key, value| walk.call(value, path + [key], file) }
+  when Array
+    key = path.join('.')
+    errors << "Package list #{key} is defined in both #{seen_lists[key]} and #{file}" if seen_lists.key?(key)
+    seen_lists[key] = file
+  end
+end
+Dir.glob(File.join(source, '.chezmoidata', '*.{yaml,yml}')).sort.each do |file|
+  begin
+    # Psych's normal loader accepts duplicate YAML keys, so inspect the syntax
+    # tree first; otherwise an earlier value could be silently lost.
+    visit = lambda do |node, path|
+      if node.is_a?(Psych::Nodes::Mapping)
+        seen = {}
+        node.children.each_slice(2) do |key, value|
+          next unless key.is_a?(Psych::Nodes::Scalar)
+          name = key.value
+          errors << "Duplicate YAML key #{(path + [name]).join('.')} in #{File.basename(file)}" if seen[name]
+          seen[name] = true
+          visit.call(value, path + [name]) if value
+        end
+      elsif node.respond_to?(:children) && node.children
+        node.children.each { |child| visit.call(child, path) }
+      end
+    end
+    visit.call(Psych.parse_stream(File.read(file)), [])
+    doc = YAML.safe_load(File.read(file), permitted_classes: [], aliases: true) || {}
+    (doc['package_groups'] || {}).each_key do |name|
+      errors << "Capability #{name} is defined in both #{seen_groups[name]} and #{File.basename(file)}" if seen_groups.key?(name)
+      seen_groups[name] = File.basename(file)
+    end
+    %w[packages package_groups profile_packages].each do |section|
+      walk.call(doc[section], [section], File.basename(file)) if doc.key?(section)
+    end
+  rescue Psych::Exception => e
+    errors << "Invalid YAML in #{File.basename(file)}: #{e.message}"
+  end
+end
+Dir.glob(File.join(source, '.chezmoidata', '*.{toml,json,jsonc}')).each do |file|
+  errors << "Cannot check duplicate definitions in #{File.basename(file)}; preflight currently supports YAML data files only"
+end
+unless errors.empty?
+  warn "Preflight errors:\n  #{errors.join("\n  ")}"
+  exit 1
+end
+data = JSON.parse(chezmoi('data', '--format', 'json'))
+known = data.fetch('package_groups', {}).keys.sort
+selected = data.fetch('capabilities', {})
+unless selected.is_a?(Hash)
+  abort('capabilities must be a dictionary of true/false values.')
+end
+(selected.keys - known).each { |name| errors << "Unknown capability: #{name}" }
+selected.each { |name, value| errors << "Capability #{name} must be true or false" unless value == true || value == false }
+machine = data.fetch('machine', {})
+errors << 'machine.role must be workstation, server or unspecified' unless %w[workstation server unspecified].include?(machine['role'])
+errors << 'machine.gui must be true or false' unless machine['gui'] == true || machine['gui'] == false
+errors << 'workstation_apps requires machine.gui = true' if selected['workstation_apps'] == true && machine['gui'] != true
+services = data.fetch('services', {}).fetch('colima', {})
+errors << 'services.colima.autostart must be true or false' unless [true, false].include?(services['autostart'])
+errors << 'Colima autostart requires containers' if services['autostart'] == true && selected['containers'] != true
+terminal = data.fetch('terminal', {}).fetch('macos_terminal', {})
+errors << 'terminal.macos_terminal.set_default_profile must be true or false' unless [true, false].include?(terminal['set_default_profile'])
+errors << 'macOS Terminal default profile requires machine.gui = true' if terminal['set_default_profile'] == true && machine['gui'] != true
+puts "Profile: #{data.dig('profile', 'kind')}  Role: #{machine['role']}  GUI: #{machine['gui']}"
+known.each do |name|
+  state = selected.key?(name) ? (selected[name] ? 'enabled' : 'disabled') : 'not specified (off)'
+  puts "  #{name}: #{state}"
+end
+missing = known - selected.keys
+unless missing.empty?
+  puts "\nAdd missing choices to [data.capabilities] in your local chezmoi config (review each value):"
+  missing.each { |name| puts "#{name} = false" }
+end
+unless errors.empty?
+  warn "\nPreflight errors:\n  #{errors.join("\n  ")}"
+  exit 1
+end
