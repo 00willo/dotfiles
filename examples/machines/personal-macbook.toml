@@ -1,0 +1,24 @@
+# Example only; review before merging into ~/.config/chezmoi/chezmoi.toml.
+[data.machine]
+role = "workstation"
+gui = true
+
+[data.capabilities]
+interactive_cli = true
+zsh_extras = true
+personal_shell = true
+development = true
+python_development = true
+go_development = false
+rust_development = false
+containers = true
+infrastructure_management = true
+workstation_apps = true
+ai_assistants = true
+local_ai = true
+
+[data.services.colima]
+autostart = true
+
+[data.terminal.macos_terminal]
+set_default_profile = true

@@ -1,2 +1,4 @@
+# This repository uses the personal profile. A separate work repo selects work
+# and supplies its own identity and optional profile package groups.
 profile:
   kind: personal

@@ -1,35 +1,43 @@
-packages:
-  #base_universal:
-  darwin:
-    personal_taps:
-      - name: jundot/omlx
-        url: https://github.com/jundot/omlx
-    personal_trusted_formulae:
-      - jundot/omlx/omlx
-    personal_cli_brews:
-      - "ansible"
-      - "omlx"
-      - "opencode"
-    personal_casks:
-      - "anydesk"
-      - "bitwarden"
-      # - "buzz"  # not the correct one, it's an audio app, not buzz.xyz
-      - "chatgpt"
-      - "claude"
-      - "claude-code"
-      - "codex"
-      - "codexbar"
-      - "discord"
-      - "hermes-desktop"
-      - "lm-studio"
-      - "granola"
-      - "slack"
-      - "stats"
-      - "teamviewer"
-      - "tailscale-app"
-      - "wispr-flow"
-      - "whatsapp"
-      - "zoom"
+# Personal package additions; the work repo supplies its own profile data.
+profile_packages:
+  personal:
+    ai_assistants:
+      darwin:
+        cli: [opencode]
+        casks: [claude-code, codex]
+    local_ai:
+      darwin:
+        taps:
+          - name: jundot/omlx
+            url: https://github.com/jundot/omlx
+        trusted_formulae: [jundot/omlx/omlx]
+        cli: [omlx]
+        gui_casks: [lm-studio]
+    workstation_apps:
+      darwin:
+        gui_casks:
+          - font-jetbrains-mono-nerd-font
+          - google-chrome
+          - obsidian
+          - visual-studio-code
+          - wezterm
+          - anydesk
+          - bitwarden
+          # buzz was excluded: the Homebrew cask is a different app.
+          - chatgpt
+          - claude
+          - codexbar
+          - discord
+          - hermes-desktop
+          - granola
+          - slack
+          - stats
+          - teamviewer
+          - tailscale-app
+          - wispr-flow
+          - whatsapp
+          - zoom
+
 git:
   email: graham@williamsonsinc.id.au
 github:
