@@ -10,8 +10,11 @@
 {{- if not (has .machine.role (list "unspecified" "workstation" "server")) -}}
   {{- fail "machine.role must be workstation or server (or unspecified until configured)." -}}
 {{- end -}}
-{{- if ne (kindOf .machine.gui) "bool" -}}
-  {{- fail "machine.gui must be true or false." -}}
+{{- if hasKey .machine "gui" -}}
+  {{- fail "machine.gui has been renamed: set machine.install_gui_packages instead." -}}
+{{- end -}}
+{{- if ne (kindOf .machine.install_gui_packages) "bool" -}}
+  {{- fail "machine.install_gui_packages must be true or false." -}}
 {{- end -}}
 {{- if ne (kindOf .services.colima.autostart) "bool" -}}
   {{- fail "services.colima.autostart must be true or false." -}}
@@ -19,12 +22,9 @@
 {{- if ne (kindOf .terminal.macos_terminal.set_default_profile) "bool" -}}
   {{- fail "terminal.macos_terminal.set_default_profile must be true or false." -}}
 {{- end -}}
-{{- if and (get $caps "workstation_apps") (not .machine.gui) -}}
-  {{- fail "workstation_apps requires machine.gui = true; disable the capability or enable the GUI." -}}
+{{- if and (get $caps "workstation_apps") (not .machine.install_gui_packages) -}}
+  {{- fail "workstation_apps requires machine.install_gui_packages = true; disable the capability or enable GUI packages." -}}
 {{- end -}}
 {{- if and .services.colima.autostart (not (get $caps "containers")) -}}
   {{- fail "Colima autostart requires the containers capability." -}}
-{{- end -}}
-{{- if and .terminal.macos_terminal.set_default_profile (not .machine.gui) -}}
-  {{- fail "The macOS Terminal default profile requires machine.gui = true." -}}
 {{- end -}}

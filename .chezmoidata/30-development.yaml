@@ -1,13 +1,25 @@
 package_groups:
   development:
     darwin:
-      cli: [gh, ghq, glow, lazygit, gitleaks]
+      cli:
+        - gh
+        - ghq
+        - glow
+        - lazygit
+        - gitleaks
   python_development:
     darwin:
-      cli: [uv]
+      cli:
+        - uv
+      gui_casks:
+        - visual-studio-code
+    vscode:
+      extensions:
+        - ms-python.python
   go_development: {}
   rust_development: {}
   ai_assistants: {}
   infrastructure_management:
     darwin:
-      cli: [ansible]
+      cli:
+        - ansible

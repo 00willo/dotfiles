@@ -23,6 +23,8 @@ class CapabilityRendering(unittest.TestCase):
             '            url: https://github.com/jundot/omlx\n'
             '        trusted_formulae: [jundot/omlx/omlx]\n'
             '        cli: [omlx]\n        gui_casks: [lm-studio]\n'
+            '    ai_assistants:\n      darwin:\n        casks: [codex]\n'
+            '        gui_casks: [chatgpt, claude]\n'
         )
         self.config = self.root / "chezmoi.toml"
         self.config.write_text("")
@@ -41,7 +43,7 @@ class CapabilityRendering(unittest.TestCase):
         self.assertEqual(set(result.stdout.split()), {'brew', '"git"', '"chezmoi"'})
 
     def test_headless_local_ai_excludes_gui(self):
-        result = self.render('[data.machine]\ngui=false\n[data.capabilities]\nlocal_ai=true\n')
+        result = self.render('[data.machine]\ninstall_gui_packages=false\n[data.capabilities]\nlocal_ai=true\n')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('brew "omlx"', result.stdout)
         self.assertNotIn('lm-studio', result.stdout)
@@ -83,20 +85,54 @@ class CapabilityRendering(unittest.TestCase):
         result = self.render('[data.capabilities]\ninterative_cli=true\n')
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('Unknown capability', result.stderr)
-        result = self.render('[data.machine]\ngui=false\n[data.capabilities]\nworkstation_apps=true\n')
+        result = self.render('[data.machine]\ninstall_gui_packages=false\n[data.capabilities]\nworkstation_apps=true\n')
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn('requires machine.gui', result.stderr)
+        self.assertIn('requires machine.install_gui_packages', result.stderr)
+
+    def test_python_gui_packages_follow_capability_and_gui_choice(self):
+        headless = self.render('[data.machine]\ninstall_gui_packages=false\n[data.capabilities]\npython_development=true\n')
+        self.assertEqual(headless.returncode, 0, headless.stderr)
+        self.assertIn('brew "uv"', headless.stdout)
+        self.assertNotIn('visual-studio-code', headless.stdout)
+        gui = self.render('[data.machine]\ninstall_gui_packages=true\n[data.capabilities]\npython_development=true\n')
+        self.assertEqual(gui.returncode, 0, gui.stderr)
+        self.assertIn('cask "visual-studio-code"', gui.stdout)
+
+    def test_ai_gui_packages_follow_gui_choice(self):
+        config = '[data.machine]\ninstall_gui_packages={}\n[data.capabilities]\nai_assistants=true\n'
+        cli = self.render(config.format('false'))
+        self.assertEqual(cli.returncode, 0, cli.stderr)
+        self.assertIn('cask "codex"', cli.stdout)
+        self.assertNotIn('chatgpt', cli.stdout)
+        gui = self.render(config.format('true'))
+        self.assertEqual(gui.returncode, 0, gui.stderr)
+        self.assertIn('cask "chatgpt"', gui.stdout)
+        self.assertIn('cask "claude"', gui.stdout)
+
+    def test_old_gui_key_requires_migration(self):
+        result = self.render('[data.machine]\ngui=true\n')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('machine.gui has been renamed', result.stderr)
+
+    def test_terminal_profile_setting_is_independent_of_gui_installation(self):
+        script = (self.source / '.chezmoiscripts/run_onchange_after_import-macos-terminal-profile.sh.tmpl').read_text()
+        template = '{{- $_ := set .chezmoi "os" "darwin" -}}' + script
+        result = self.render('[data.machine]\ninstall_gui_packages=false\n'
+                             '[data.terminal.macos_terminal]\nset_default_profile=true\n',
+                             template)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('Default Window Settings', result.stdout)
 
     def test_work_without_personal_files(self):
         (self.source / '.chezmoidata/15-personal.yaml').unlink()
         (self.source / '.chezmoitemplates/personal-ssh-config').unlink(missing_ok=True)
         (self.source / '.chezmoidata/90-work.yaml').write_text('profile:\n  kind: work\n')
-        result = self.render('[data.machine]\ngui=true\n[data.capabilities]\nworkstation_apps=true\n')
+        result = self.render('[data.machine]\ninstall_gui_packages=true\n[data.capabilities]\nworkstation_apps=true\n')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('brew "git"', result.stdout)
         self.assertNotIn('obsidian', result.stdout)
         ssh = (self.source / 'private_dot_ssh/config.tmpl').read_text()
-        result = self.render('[data.machine]\ngui=true\n', ssh)
+        result = self.render('[data.machine]\ninstall_gui_packages=true\n', ssh)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertNotIn('192.168.5.161', result.stdout)
 

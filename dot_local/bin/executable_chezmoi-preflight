@@ -82,15 +82,15 @@ end
 selected.each { |name, value| errors << "Capability #{name} must be true or false" unless value == true || value == false }
 machine = data.fetch('machine', {})
 errors << 'machine.role must be workstation, server or unspecified' unless %w[workstation server unspecified].include?(machine['role'])
-errors << 'machine.gui must be true or false' unless machine['gui'] == true || machine['gui'] == false
-errors << 'workstation_apps requires machine.gui = true' if selected['workstation_apps'] == true && machine['gui'] != true
+errors << 'machine.gui has been renamed to machine.install_gui_packages' if machine.key?('gui')
+errors << 'machine.install_gui_packages must be true or false' unless machine['install_gui_packages'] == true || machine['install_gui_packages'] == false
+errors << 'workstation_apps requires machine.install_gui_packages = true' if selected['workstation_apps'] == true && machine['install_gui_packages'] != true
 services = data.fetch('services', {}).fetch('colima', {})
 errors << 'services.colima.autostart must be true or false' unless [true, false].include?(services['autostart'])
 errors << 'Colima autostart requires containers' if services['autostart'] == true && selected['containers'] != true
 terminal = data.fetch('terminal', {}).fetch('macos_terminal', {})
 errors << 'terminal.macos_terminal.set_default_profile must be true or false' unless [true, false].include?(terminal['set_default_profile'])
-errors << 'macOS Terminal default profile requires machine.gui = true' if terminal['set_default_profile'] == true && machine['gui'] != true
-puts "Profile: #{data.dig('profile', 'kind')}  Role: #{machine['role']}  GUI: #{machine['gui']}"
+puts "Profile: #{data.dig('profile', 'kind')}  Role: #{machine['role']}  Install GUI packages: #{machine['install_gui_packages']}"
 known.each do |name|
   state = selected.key?(name) ? (selected[name] ? 'enabled' : 'disabled') : 'not specified (off)'
   puts "  #{name}: #{state}"

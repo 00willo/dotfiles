@@ -117,9 +117,11 @@ and `local_ai`. Go and Rust currently have no packages. Group definitions live
 in the numbered data files and the selected groups are combined and deduplicated
 in `.chezmoitemplates/darwin-brewfile`.
 
-`machine.role` describes a workstation or server. `machine.gui` records GUI
-availability. `workstation_apps` requires a GUI; `local_ai` can be selected on
-a headless Mac to install OMLX without the LM Studio GUI. Colima autostart and
+`machine.role` describes a workstation or server. `machine.install_gui_packages`
+controls whether selected groups include GUI packages; it does not describe
+whether the machine has a graphical desktop. `workstation_apps` requires GUI
+package installation; `local_ai` can be selected without it to install OMLX
+without the LM Studio GUI. Colima autostart and
 setting the macOS Terminal default profile have separate local settings.
 Turning a capability off stops requesting its packages; it does not uninstall
 them or stop a service already running.
@@ -206,9 +208,11 @@ The duplicate-definition check inspects root `.chezmoidata` YAML files; it
 reports other data formats as unsupported rather than silently skipping them.
 A package selected by multiple groups is deduplicated during Brewfile rendering.
 
-The extension installer runs after each apply on a GUI-enabled Mac with Python
-development selected. It looks for the VS Code CLI and retries on a later apply
-if the editor is unavailable. It only installs extensions not already listed.
+On a Mac with Python development and GUI package installation selected, the
+Python development group includes VS Code and the extension installer runs after
+each apply. It installs extensions that are not already listed and fails with a
+message if the VS Code CLI is unavailable. Configuring macOS Terminal's default
+profile is a separate machine setting and does not require GUI package installation.
 
 Review and apply:
 

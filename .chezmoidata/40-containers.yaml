@@ -1,6 +1,7 @@
 package_groups:
   containers:
     darwin:
-      cli: [docker, docker-compose, colima]
-  local_ai: {}
-  workstation_apps: {}
+      cli:
+        - docker
+        - docker-compose
+        - colima

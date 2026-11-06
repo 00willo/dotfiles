@@ -1,8 +1,8 @@
-{{ if and (eq .chezmoi.os "darwin") .machine.gui (get .capabilities "python_development") -}}
+{{ if and (eq .chezmoi.os "darwin") .machine.install_gui_packages (get .capabilities "python_development") -}}
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Run on each apply so an editor installed later can receive its extensions.
+# Python development with GUI packages requests the VS Code extensions.
 if command -v code >/dev/null 2>&1; then
     code_cli=$(command -v code)
 elif [[ -x "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]]; then
@@ -10,12 +10,12 @@ elif [[ -x "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin
 elif [[ -x "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]]; then
     code_cli="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
 else
-    echo "VS Code CLI not found; Python extensions will be retried on the next chezmoi apply."
-    exit 0
+    echo "VS Code CLI not found; install VS Code or disable GUI packages for Python development, then retry chezmoi apply." >&2
+    exit 1
 fi
 
 installed=$("$code_cli" --list-extensions)
-{{ range .vscode.python_extensions -}}
+{{ range .package_groups.python_development.vscode.extensions -}}
 if ! printf '%s\n' "$installed" | grep -Fxiq -- {{ . | quote }}; then
     "$code_cli" --install-extension {{ . | quote }}
 fi

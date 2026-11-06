@@ -3,7 +3,7 @@ git:
 
 machine:
   role: unspecified
-  gui: false
+  install_gui_packages: false
 
 capabilities: {}
 profile_packages: {}
@@ -30,7 +30,3 @@ packages:
     cli: []
   ubuntu:
     cli: []
-
-vscode:
-  python_extensions:
-    - ms-python.python

@@ -45,7 +45,7 @@
       {{- range (get $darwin "casks" | default list) -}}
         {{- $_ := set $casks . true -}}
       {{- end -}}
-      {{- if $.machine.gui -}}
+      {{- if $.machine.install_gui_packages -}}
         {{- range (get $darwin "gui_casks" | default list) -}}
           {{- $_ := set $casks . true -}}
         {{- end -}}
