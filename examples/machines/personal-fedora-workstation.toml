@@ -1,7 +1,7 @@
 # Example only; Linux package provisioning is not implemented yet.
 [data.machine]
 role = "workstation"
-gui = true
+install_gui_packages = true
 
 [data.capabilities]
 interactive_cli = true

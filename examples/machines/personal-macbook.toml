@@ -1,7 +1,7 @@
 # Example only; review before merging into ~/.config/chezmoi/chezmoi.toml.
 [data.machine]
 role = "workstation"
-gui = true
+install_gui_packages = true
 
 [data.capabilities]
 interactive_cli = true

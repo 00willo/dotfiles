@@ -3,29 +3,35 @@ profile_packages:
   personal:
     ai_assistants:
       darwin:
-        cli: [opencode]
-        casks: [claude-code, codex]
+        cli:
+          - opencode
+        casks:
+          - claude-code
+          - codex
+        gui_casks:
+          - chatgpt
+          - claude
     local_ai:
       darwin:
         taps:
           - name: jundot/omlx
             url: https://github.com/jundot/omlx
-        trusted_formulae: [jundot/omlx/omlx]
-        cli: [omlx]
-        gui_casks: [lm-studio]
+        trusted_formulae:
+          - jundot/omlx/omlx
+        cli:
+          - omlx
+        gui_casks:
+          - lm-studio
     workstation_apps:
       darwin:
         gui_casks:
           - font-jetbrains-mono-nerd-font
           - google-chrome
           - obsidian
-          - visual-studio-code
           - wezterm
           - anydesk
           - bitwarden
           # buzz was excluded: the Homebrew cask is a different app.
-          - chatgpt
-          - claude
           - codexbar
           - discord
           - hermes-desktop
